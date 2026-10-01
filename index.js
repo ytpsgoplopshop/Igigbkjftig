@@ -6,7 +6,7 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Real-time synchronization
+// Real-time synchronization & Cache-Control
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -124,7 +124,8 @@ app.get('/playlists', async (req, res) => {
 
     let list = Array.from(seenMap.values());
     if (list.length === 0) list.push("Hindi Song's");
-    res.json(list);
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json(list);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch playlists' });
   }
@@ -207,7 +208,8 @@ app.get('/songs', async (req, res) => {
     }
 
     const results = await Promise.all(songPromises);
-    res.json(results.flat());
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json(results.flat());
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch tracks' });
   }
